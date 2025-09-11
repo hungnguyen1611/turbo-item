@@ -1,9 +1,12 @@
+import { Box, Stack } from "@mui/material";
 import DataTable from "./components/DataTable";
+import Dexed from "./components/Dexed";
 
 export default function App() {
   return (
-    <div>
+    <Stack spacing={4} sx={{}}>
       <DataTable />
-    </div>
+      <Dexed />
+    </Stack>
   );
 }
