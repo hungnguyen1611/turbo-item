@@ -84,10 +84,9 @@
 // };
 
 // export default ImageUploadModal;
-
 import React, { useState } from "react";
 import { Modal, Upload, message, Row, Col, Image } from "antd";
-import { InboxOutlined } from "@ant-design/icons";
+import { InboxOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 
@@ -114,7 +113,12 @@ const ImageUploadModal = ({ visible, onClose }) => {
     },
   };
 
-  // Hàm gộp file và lưu xuống máy khi nhấn Xong
+  // Xóa ảnh khỏi danh sách
+  const removeImage = (index) => {
+    setFileList((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // Gộp file và lưu xuống máy khi nhấn Xong
   const handleOk = async () => {
     if (fileList.length === 0) {
       message.warning("Chưa có ảnh nào để gộp");
@@ -123,7 +127,6 @@ const ImageUploadModal = ({ visible, onClose }) => {
     }
 
     const zip = new JSZip();
-
     for (const f of fileList) {
       const file = f.originFileObj;
       if (file) {
@@ -131,13 +134,8 @@ const ImageUploadModal = ({ visible, onClose }) => {
       }
     }
 
-    // tạo blob zip
     const zipBlob = await zip.generateAsync({ type: "blob" });
-
-    // lưu xuống máy bằng file-saver
     saveAs(zipBlob, "images.zip");
-
-    // đồng thời log ra console nếu muốn gửi server
     console.log("File zip đã gộp:", zipBlob);
 
     onClose();
@@ -177,17 +175,34 @@ const ImageUploadModal = ({ visible, onClose }) => {
                 URL.createObjectURL(file.originFileObj);
               return (
                 <Col key={index}>
-                  <Image
-                    src={preview}
-                    width={80}
-                    height={80}
-                    style={{
-                      objectFit: "cover",
-                      borderRadius: 6,
-                      border: "2px solid #fff",
-                      boxShadow: "0 0 2px rgba(0,0,0,0.3)",
-                    }}
-                  />
+                  <div
+                    style={{ position: "relative", display: "inline-block" }}
+                  >
+                    <Image
+                      src={preview}
+                      width={80}
+                      height={80}
+                      style={{
+                        objectFit: "cover",
+                        borderRadius: 6,
+                        border: "2px solid #fff",
+                        boxShadow: "0 0 2px rgba(0,0,0,0.3)",
+                      }}
+                    />
+                    <CloseCircleOutlined
+                      onClick={() => removeImage(index)}
+                      style={{
+                        position: "absolute",
+                        top: -8,
+                        right: -8,
+                        fontSize: 18,
+                        color: "red",
+                        cursor: "pointer",
+                        background: "#fff",
+                        borderRadius: "50%",
+                      }}
+                    />
+                  </div>
                 </Col>
               );
             })}
